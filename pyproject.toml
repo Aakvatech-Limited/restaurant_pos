@@ -1,5 +1,6 @@
 [project]
 name = "restaurant_pos"
+version = "0.0.1"
 authors = [
     { name = "Aakvatech", email = "info@aakvatech.com" }
 ]
@@ -21,3 +22,6 @@ Homepage = "https://github.com/aakvatech/restaurant_pos"
 exclude = [
     "frontend/"
 ]
+
+[tool.setuptools]
+packages = ["restaurant_pos"]
