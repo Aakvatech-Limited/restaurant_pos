@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "creation": "2026-06-08 05:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "table_id",
+  "order_type",
+  "status",
+  "remarks",
+  "items_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "table_id",
+   "fieldtype": "Data",
+   "label": "Table / Order ID",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "order_type",
+   "fieldtype": "Select",
+   "label": "Order Type",
+   "options": "Dine-In\nTake-Away\nDelivery",
+   "default": "Dine-In",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "KOT Status",
+   "options": "Pending\nPreparing\nReady\nServed",
+   "default": "Pending",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "General Remarks"
+  },
+  {
+   "fieldname": "items_json",
+   "fieldtype": "Long Text",
+   "label": "Ordered Items (JSON)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-08 05:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Restaurant POS",
+ "name": "KOT Entry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

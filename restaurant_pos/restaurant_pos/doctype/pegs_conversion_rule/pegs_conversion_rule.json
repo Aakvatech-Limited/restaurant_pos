@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "creation": "2026-06-08 05:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parent_bottle_item",
+  "peg_item",
+  "conversion_factor"
+ ],
+ "fields": [
+  {
+   "fieldname": "parent_bottle_item",
+   "fieldtype": "Link",
+   "label": "Parent Bottle Item",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "peg_item",
+   "fieldtype": "Link",
+   "label": "Peg Item (Serving)",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "conversion_factor",
+   "fieldtype": "Float",
+   "label": "Conversion Factor (Pegs per Bottle)",
+   "reqd": 1,
+   "default": 25
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-08 05:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Restaurant POS",
+ "name": "Pegs Conversion Rule",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

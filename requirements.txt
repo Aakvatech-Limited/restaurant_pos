@@ -1,0 +1,2 @@
+# Frappe app python dependencies
+requests

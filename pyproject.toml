@@ -1,0 +1,23 @@
+[project]
+name = "restaurant_pos"
+authors = [
+    { name = "Aakvatech", email = "info@aakvatech.com" }
+]
+description = "A premium Restaurant POS custom app for ERPNext v15 using Frappe UI"
+requires-python = ">=3.10"
+readme = "README.md"
+classifiers = [
+    "Framework :: Frappe",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "frappe"
+]
+
+[project.urls]
+Homepage = "https://github.com/aakvatech/restaurant_pos"
+
+[tool.flit.sdist]
+exclude = [
+    "frontend/"
+]

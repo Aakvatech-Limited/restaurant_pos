@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Digital Restaurant Menu</title>
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<!-- Tailwind & FontAwesome CDN -->
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Vue 3 -->
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<style>
+		body {
+			font-family: 'Outfit', sans-serif;
+			background: radial-gradient(circle at top, #1e1e38, #0f0f1d);
+			color: #e2e8f0;
+		}
+		.glassmorphism {
+			background: rgba(255, 255, 255, 0.03);
+			backdrop-filter: blur(16px);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+		.accent-glow {
+			box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+		}
+	</style>
+</head>
+<body class="min-h-screen">
+	<div id="app" class="max-w-md mx-auto px-4 py-6 relative">
+		<!-- Header -->
+		<header class="flex justify-between items-center mb-8">
+			<div>
+				<h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">BistroPOS</h1>
+				<p class="text-xs text-gray-400">Table: {{ tableId || 'Dine-In/Takeaway' }}</p>
+			</div>
+			<div class="relative">
+				<button @click="showCart = !showCart" class="glassmorphism w-12 h-12 rounded-full flex items-center justify-center text-xl relative hover:scale-105 transition">
+					<i class="fa-solid fa-bag-shopping text-indigo-400"></i>
+					<span v-if="cart.length" class="absolute -top-1 -right-1 bg-pink-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">{{ cartQuantity }}</span>
+				</button>
+			</div>
+		</header>
+
+		<!-- Categories Slider -->
+		<div class="flex gap-3 overflow-x-auto pb-4 mb-6 no-scrollbar">
+			<button 
+				@click="selectedGroup = ''"
+				:class="['px-4 py-2 rounded-full text-sm font-semibold transition shrink-0', !selectedGroup ? 'bg-indigo-600 text-white accent-glow' : 'glassmorphism text-gray-300']"
+			>
+				All Menu
+			</button>
+			<button 
+				v-for="group in itemGroups" 
+				:key="group"
+				@click="selectedGroup = group"
+				:class="['px-4 py-2 rounded-full text-sm font-semibold transition shrink-0', selectedGroup === group ? 'bg-indigo-600 text-white accent-glow' : 'glassmorphism text-gray-300']"
+			>
+				{{ group }}
+			</button>
+		</div>
+
+		<!-- Search Bar -->
+		<div class="relative mb-6">
+			<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+				<i class="fa-solid fa-magnifying-glass"></i>
+			</span>
+			<input 
+				v-model="searchQuery" 
+				type="text" 
+				placeholder="Search delicious dishes..." 
+				class="w-full pl-10 pr-4 py-3 rounded-2xl glassmorphism focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-400 text-white"
+			>
+		</div>
+
+		<!-- Menu Grid -->
+		<div class="grid grid-cols-1 gap-4">
+			<div v-for="item in filteredItems" :key="item.name" class="glassmorphism rounded-3xl p-4 flex gap-4 items-center">
+				<img :src="item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200'" class="w-20 h-20 rounded-2xl object-cover" alt="item.item_name">
+				<div class="flex-1 min-w-0">
+					<h3 class="font-bold text-lg text-white truncate">{{ item.item_name }}</h3>
+					<p class="text-xs text-gray-400 line-clamp-2 mt-1">{{ item.description || 'Prepared fresh with finest ingredients.' }}</p>
+					<div class="flex justify-between items-center mt-3">
+						<span class="text-indigo-400 font-bold text-lg">${{ parseFloat(item.standard_rate || 0).toFixed(2) }}</span>
+						<button @click="addToCart(item)" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition">
+							<i class="fa-solid fa-plus"></i> Add to Cart
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Cart Slideover -->
+		<div v-if="showCart" class="fixed inset-0 z-50 flex justify-end">
+			<div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showCart = false"></div>
+			<div class="relative w-full max-w-md bg-[#0f0f1d] h-full flex flex-col p-6 shadow-2xl glassmorphism border-l border-white/10">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-indigo-400"></i> Your Cart</h2>
+					<button @click="showCart = false" class="text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+				</div>
+
+				<div class="flex-1 overflow-y-auto space-y-4 pr-1">
+					<div v-if="!cart.length" class="text-center py-12 text-gray-400">
+						<i class="fa-solid fa-basket-shopping text-5xl mb-4 text-gray-600"></i>
+						<p>Your basket is currently empty.</p>
+					</div>
+					<div v-for="(cartItem, idx) in cart" :key="idx" class="glassmorphism p-4 rounded-2xl flex gap-3 items-center">
+						<div class="flex-1">
+							<h4 class="font-semibold text-white">{{ cartItem.item_name }}</h4>
+							<div class="flex items-center gap-3 mt-2">
+								<button @click="updateQty(idx, -1)" class="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-xs"><i class="fa-solid fa-minus"></i></button>
+								<span class="text-sm font-bold text-white">{{ cartItem.qty }}</span>
+								<button @click="updateQty(idx, 1)" class="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-xs"><i class="fa-solid fa-plus"></i></button>
+							</div>
+						</div>
+						<div class="text-right">
+							<span class="text-indigo-400 font-bold">${{ (cartItem.standard_rate * cartItem.qty).toFixed(2) }}</span>
+							<button @click="removeFromCart(idx)" class="block text-xs text-red-400 mt-2 hover:underline">Remove</button>
+						</div>
+					</div>
+				</div>
+
+				<div v-if="cart.length" class="border-t border-white/10 pt-4 mt-4 space-y-3">
+					<div class="flex justify-between text-lg font-bold text-white">
+						<span>Total:</span>
+						<span class="text-indigo-400">${{ cartTotal.toFixed(2) }}</span>
+					</div>
+					
+					<div v-if="isLoggedIn" class="space-y-3">
+						<button @click="submitOrder" :disabled="loading" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition accent-glow">
+							<i v-if="loading" class="fa-solid fa-spinner animate-spin"></i>
+							Place Sales Order
+						</button>
+					</div>
+					<div v-else class="text-center p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/20">
+						<p class="text-xs text-indigo-300 mb-2">Login to submit your order directly to the kitchen.</p>
+						<a href="/login" class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Login with ERPNext</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const { createApp, ref, computed, onMounted } = Vue;
+		createApp({
+			setup() {
+				const items = ref([]);
+				const itemGroups = ref([]);
+				const cart = ref([]);
+				const selectedGroup = ref('');
+				const searchQuery = ref('');
+				const showCart = ref(false);
+				const isLoggedIn = ref(false);
+				const loading = ref(false);
+				
+				// Parse Table ID from URL queries
+				const urlParams = new URLSearchParams(window.location.search);
+				const tableId = ref(urlParams.get('table') || '');
+
+				const cartQuantity = computed(() => cart.value.reduce((acc, curr) => acc + curr.qty, 0));
+				const cartTotal = computed(() => cart.value.reduce((acc, curr) => acc + (curr.standard_rate * curr.qty), 0));
+
+				const filteredItems = computed(() => {
+					return items.value.filter(item => {
+						const matchGroup = !selectedGroup.value || item.item_group === selectedGroup.value;
+						const matchSearch = !searchQuery.value || item.item_name.toLowerCase().includes(searchQuery.value.toLowerCase());
+						return matchGroup && matchSearch;
+					});
+				});
+
+				const fetchMenu = async () => {
+					try {
+						const res = await fetch('/api/method/restaurant_pos.api.get_items_by_group');
+						const data = await res.json();
+						items.value = data.message || [];
+						// Extract unique groups
+						itemGroups.value = [...new Set(items.value.map(i => i.item_group))];
+					} catch (e) {
+						console.error("Error fetching menu items: ", e);
+					}
+				};
+
+				const checkAuth = async () => {
+					try {
+						const res = await fetch('/api/method/frappe.auth.get_logged_user');
+						if (res.ok) {
+							const data = await res.json();
+							isLoggedIn.value = !!data.message;
+						}
+					} catch (e) {
+						isLoggedIn.value = false;
+					}
+				};
+
+				const addToCart = (item) => {
+					const existing = cart.value.find(c => c.name === item.name);
+					if (existing) {
+						existing.qty += 1;
+					} else {
+						cart.value.push({ ...item, qty: 1 });
+					}
+				};
+
+				const updateQty = (idx, amount) => {
+					cart.value[idx].qty += amount;
+					if (cart.value[idx].qty <= 0) {
+						cart.value.splice(idx, 1);
+					}
+				};
+
+				const removeFromCart = (idx) => {
+					cart.value.splice(idx, 1);
+				};
+
+				const submitOrder = async () => {
+					loading.value = true;
+					try {
+						const res = await fetch('/api/method/frappe.client.insert', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								doc: {
+									doctype: 'Sales Order',
+									naming_series: 'SO-M-',
+									customer: 'Cash Customer', // fallback default
+									transaction_date: new Date().toISOString().split('T')[0],
+									delivery_date: new Date().toISOString().split('T')[0],
+									custom_table_id: tableId.value,
+									items: cart.value.map(i => ({
+										item_code: i.name,
+										qty: i.qty,
+										delivery_date: new Date().toISOString().split('T')[0],
+										warehouse: 'Stores - A'
+									}))
+								}
+							})
+						});
+						if (res.ok) {
+							alert("Order placed successfully! Sending to Kitchen.");
+							cart.value = [];
+							showCart.value = false;
+						} else {
+							alert("Failed to submit order. Please retry.");
+						}
+					} catch (e) {
+						alert("An error occurred during submission.");
+					} finally {
+						loading.value = false;
+					}
+				};
+
+				onMounted(() => {
+					fetchMenu();
+					checkAuth();
+				});
+
+				return {
+					items, itemGroups, cart, selectedGroup, searchQuery, showCart, isLoggedIn, loading, tableId,
+					cartQuantity, cartTotal, filteredItems, addToCart, updateQty, removeFromCart, submitOrder
+				};
+			}
+		}).mount('#app');
+	</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "creation": "2026-06-08 05:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "default_warehouse",
+  "whatsapp_settings_section",
+  "whatsapp_gateway",
+  "meta_phone_number_id",
+  "meta_access_token",
+  "twilio_sid",
+  "twilio_auth_token",
+  "twilio_whatsapp_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Default Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_warehouse",
+   "fieldtype": "Link",
+   "label": "Default POS Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "whatsapp_settings_section",
+   "fieldtype": "Section Break",
+   "label": "WhatsApp Integration Settings"
+  },
+  {
+   "fieldname": "whatsapp_gateway",
+   "fieldtype": "Select",
+   "label": "WhatsApp Gateway",
+   "options": "Meta\nTwilio",
+   "default": "Meta"
+  },
+  {
+   "fieldname": "meta_phone_number_id",
+   "fieldtype": "Data",
+   "label": "Meta Phone Number ID",
+   "depends_on": "eval:doc.whatsapp_gateway=='Meta'"
+  },
+  {
+   "fieldname": "meta_access_token",
+   "fieldtype": "Password",
+   "label": "Meta Access Token",
+   "depends_on": "eval:doc.whatsapp_gateway=='Meta'"
+  },
+  {
+   "fieldname": "twilio_sid",
+   "fieldtype": "Data",
+   "label": "Twilio Account SID",
+   "depends_on": "eval:doc.whatsapp_gateway=='Twilio'"
+  },
+  {
+   "fieldname": "twilio_auth_token",
+   "fieldtype": "Password",
+   "label": "Twilio Auth Token",
+   "depends_on": "eval:doc.whatsapp_gateway=='Twilio'"
+  },
+  {
+   "fieldname": "twilio_whatsapp_number",
+   "fieldtype": "Data",
+   "label": "Twilio WhatsApp Number",
+   "depends_on": "eval:doc.whatsapp_gateway=='Twilio'"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-06-08 05:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Restaurant POS",
+ "name": "Restaurant POS Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
